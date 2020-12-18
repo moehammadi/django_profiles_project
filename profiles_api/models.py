@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import User, AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 
 class UserProfileManager(BaseUserManager):
@@ -48,3 +48,16 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """Return String Representation of User"""
         return self.email
+
+
+class School(models.Model):
+    name = models.CharField(max_length=30)
+    address = models.TextField()
+    manager = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+
+

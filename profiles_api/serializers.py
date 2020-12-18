@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserProfile
+from .models import UserProfile, School
 
 
 class HelloSerializer(serializers.Serializer):
@@ -33,3 +33,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+
+class SchoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = School
+        fields = ('name', 'address', 'manager')

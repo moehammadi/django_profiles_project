@@ -2,6 +2,7 @@ from rest_framework import status, filters, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 
@@ -97,16 +98,25 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     search_fields = ('name', 'email')
 
 
-class SchoolViewSet(viewsets.ModelViewSet):
-    """Handles creating, updating, and listing Schools"""
-    serializer_class = serializers.SchoolSerializer
-    queryset = models.School.objects.all()
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'address')
-    permission_classes = (permissions.UpdateOwnProfile,)
-
-
 class UserLoginApiView(ObtainAuthToken):
     """Handle creating user authentication tokens"""
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
+
+class UserProfileFeedViewSet(viewsets.ModelViewSet):
+    """Handles Creating, updating and reading profile feed items"""
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.ProfileFeedItemSerializer
+    permission_classes = (
+        permissions.UpdateOwnStatus, # User can only update his feeds
+        IsAuthenticated,  # Cannot create feed if not authenticated
+    )
+
+    def get_queryset(self):
+        return models.ProfileFeedItem.objects\
+            .filter(user_profile=self.request.user)\
+            .order_by('-created_on')
+
+    def perform_create(self, serializer):
+        """Sets the user profile to the logged in user"""
+        serializer.save(user_profile=self.request.user)

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.conf import settings
 
 
 class UserProfileManager(BaseUserManager):
@@ -50,14 +51,11 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-class School(models.Model):
-    name = models.CharField(max_length=30)
-    address = models.TextField()
-    manager = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+class ProfileFeedItem(models.Model):
+    """Database Model for profile Status Update"""
+    user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    status_text = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
-
-
-
-
+        return self.status_text
